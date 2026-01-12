@@ -2,7 +2,7 @@
 @import url("./fonts.css");
 
 section {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .header-section {
@@ -30,7 +30,7 @@ section {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-auto-rows: auto;
-  gap: 6px 18px;
+  gap: 1ch 2ch;
 }
 
 .contact-item {
@@ -41,7 +41,7 @@ section {
 }
 
 .contact-icon {
-  margin-right: 8px;
+  margin-right: 1ch;
   width: 16px;
   height: 16px;
 }
@@ -50,16 +50,16 @@ section {
 }
 
 h2.section-title {
-  margin-bottom: 0.75rem;
+  margin-bottom: 1ch;
 }
 
 .experience {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5ch;
 }
 
 .experience h3 {
-  padding-bottom: 2px;
-  margin-bottom: 2px;
+  padding-bottom: 0.5ch;
+  margin-bottom: 0.5ch;
 }
 
 .with-underline {

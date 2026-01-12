@@ -4,6 +4,7 @@ import type { Theme } from "../types";
 export const sectionMap: { [key: string]: keyof Theme } = {
   experienceList: "experienceSectionTemplate",
   skillList: "skillsSectionTemplate",
+  summary: "summarySectionTemplate",
 };
 
 export const setDOMInnerHTML = (ID: string, innerValue: any) => {

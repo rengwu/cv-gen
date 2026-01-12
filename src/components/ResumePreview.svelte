@@ -159,7 +159,7 @@
   .page-frame {
     max-width: 850px;
     width: 100%;
-    padding: 64px;
+    padding: 3.5rem;
     background: #f5f5f5;
     box-shadow: 3px 3px 13px -3px rgba(0, 0, 0, 0.2);
     flex-shrink: 0;

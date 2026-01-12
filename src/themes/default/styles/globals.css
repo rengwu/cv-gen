@@ -10,7 +10,7 @@
   --color-skill-2: rgb(179, 193, 206);
   --color-skill-1: rgb(220, 221, 214);
 
-  --font-serif: "Frank Ruhl Libre", serif;
+  --font-serif: "Serrif", serif;
   --font-sans-serif: "Inter", sans-serif;
 
   /* default foreground color */
@@ -18,7 +18,7 @@
 }
 
 .text-subtitle {
-  font-size: 12px;
+  font-size: 10px;
   font-family: var(--font-sans-serif);
   font-weight: 400;
   font-style: normal;
@@ -29,27 +29,28 @@
 }
 
 .text-body {
-  font-size: 14px;
+  font-size: 12px;
   font-family: var(--font-sans-serif);
   font-weight: 400;
   font-style: normal;
-  line-height: 140%;
-  letter-spacing: -0.02em;
+  line-height: 2.25ch;
+  letter-spacing: -0.005ch;
   text-decoration: none;
   text-transform: none;
 }
 
 .text-experience-title {
-  font-size: 16px;
+  font-size: 14px;
   font-family: var(--font-serif);
   font-weight: 400;
   font-style: normal;
   text-decoration: none;
   text-transform: none;
+  line-height: 1;
 }
 
 .text-section-title {
-  font-size: 14px;
+  font-size: 13px;
   font-family: var(--font-sans-serif);
   font-weight: 700;
   font-style: normal;
@@ -70,12 +71,14 @@
 }
 
 .text-header-title {
-  font-size: 42px;
+  font-size: 36px;
   font-family: var(--font-serif);
   font-weight: 400;
   font-style: normal;
   text-decoration: none;
   text-transform: none;
+  line-height: 1;
+  margin-bottom: 0.5rem;
 }
 
 .text-contact-item {
@@ -85,4 +88,8 @@
   font-style: normal;
   text-decoration: none;
   text-transform: none;
+}
+
+.text-summary-description {
+
 }

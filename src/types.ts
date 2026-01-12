@@ -7,6 +7,7 @@ export type Theme = {
   contactItemTemplate: string;
   experienceSectionTemplate: string;
   skillsSectionTemplate: string;
+  summarySectionTemplate: string;
   icons: {
     [key: string]: string;
   };
@@ -47,13 +48,14 @@ export type Section<
   type: sectionDataTypeName;
 };
 
-export type ValidSection = ExperienceSection | SkillSection;
+export type ValidSection = ExperienceSection | SkillSection | SummarySection;
 export type ValidSectionDataTypeNames = keyof typeof sectionMap;
 
 export type ExperienceSection = Section<Experience[], "experienceList">;
 export type SkillSection = Section<Skill[], "skillList"> & {
   labels: { low: string; high: string };
 };
+export type SummarySection = Section<Summary, "summary">;
 
 export type Experience = {
   title: string;
@@ -66,6 +68,10 @@ export type Experience = {
 export type Skill = {
   name: string;
   level: 1 | 2 | 3 | 4 | 5;
+};
+
+export type Summary = {
+  description: string;
 };
 
 // background types

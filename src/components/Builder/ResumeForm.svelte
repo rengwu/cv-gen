@@ -36,9 +36,16 @@
     labels: { low: "rarely", high: "often" },
   };
 
+  let summarySectionTemplate: ValidSection = {
+    title: "",
+    data: { description: "" },
+    type: "summary",
+  };
+
   let sectionTemplateMap = {
     experience: experienceSectionTemplate,
     skills: skillSectionTemplate,
+    summary: summarySectionTemplate,
   };
 
   let experienceDataTemplate: Experience = {
@@ -71,18 +78,16 @@
 
   const addExperienceItem = (index: number) => {
     const template = { ...experienceDataTemplate };
-    // @ts-ignore
     formState.sections[index].data = [
-      ...formState.sections[index].data,
+      ...(formState.sections[index].data as Experience[]),
       template,
     ];
   };
 
   const addSkillItem = (index: number) => {
     const template = { ...skillDataTemplate };
-    // @ts-ignore
     formState.sections[index].data = [
-      ...formState.sections[index].data,
+      ...(formState.sections[index].data as Skill[]),
       template,
     ];
   };
@@ -92,12 +97,13 @@
     experienceIndex: number
   ) => {
     const existingItems = [
-      ...(formState.sections[sectionIndex].data[experienceIndex] as Experience)
-        .items,
+      ...(formState.sections[sectionIndex].data as Experience[])[
+        experienceIndex
+      ].items,
     ];
-    (
-      formState.sections[sectionIndex].data[experienceIndex] as Experience
-    ).items = [...existingItems, ""];
+    (formState.sections[sectionIndex].data as Experience[])[
+      experienceIndex
+    ].items = [...existingItems, ""];
   };
 </script>
 
@@ -291,6 +297,14 @@
             <Button type="secondary" on:click={() => addSkillItem(i)}>
               Add Skill
             </Button>
+          {:else if section.type === "summary"}
+            <div>
+              <textarea
+                class="w-full text-xs rounded-[2px] mb-[-6px] p-1"
+                placeholder="Summary description"
+                bind:value={section.data.description}
+              />
+            </div>
           {/if}
         </div>
       </div>
@@ -303,6 +317,7 @@
           Experience Section
         </button>
         <button on:click={() => addSection("skills")}>Skills Section</button>
+        <button on:click={() => addSection("summary")}>Summary Section</button>
       </Dropdown>
     </div>
   </FormSection>

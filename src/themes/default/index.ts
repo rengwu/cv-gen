@@ -4,6 +4,7 @@ import { experienceSectionTemplate } from "./components/experienceSectionTemplat
 import { skillsSectionTemplate } from "./components/skillsSectionTemplate";
 import { pageTemplate } from "./pageTemplate";
 import icons from "./assets/icons";
+import { summarySectionTemplate } from "./components/summarySectionTemplate";
 
 export const theme: Theme = {
   name: "default",
@@ -11,6 +12,7 @@ export const theme: Theme = {
   contactItemTemplate: contactItemTemplate,
   experienceSectionTemplate: experienceSectionTemplate,
   skillsSectionTemplate: skillsSectionTemplate,
+  summarySectionTemplate: summarySectionTemplate,
   icons: icons,
 };
 
