@@ -9,13 +9,32 @@
   import { copyToClipboard, downloadAsJSON } from "@/files";
   import { inputDataSchema } from "@/resumeSchema";
   import type { InputData } from "../../types";
+  import { browser } from "$app/environment";
 
-  let formState = $state<InputData>({
+  const DRAFT_KEY = "cv-gen:draft";
+  const DRAFT_LANG_KEY = "cv-gen:draft-language";
+
+  const emptyState = (): InputData => ({
     defaultLanguage: "",
     theme: "default",
     languages: {},
     background: { type: "solid", color: "red" },
   });
+
+  function loadDraft(): InputData {
+    if (!browser) return emptyState();
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return emptyState();
+      const result = inputDataSchema.safeParse(JSON.parse(raw));
+      if (result.success) return result.data as InputData;
+    } catch {
+      // corrupted draft — fall through to a fresh state
+    }
+    return emptyState();
+  }
+
+  let formState = $state<InputData>(loadDraft());
   let jsonToImport = $state("");
   let importError = $state("");
   let sidebarWidth = $state(360);
@@ -24,7 +43,9 @@
   const sidebarStates = ["builder", "importJSON", "saveResume"] as const;
   let sidebarState = $state<(typeof sidebarStates)[number]>(sidebarStates[0]);
 
-  let currentLanguage = $state<string | null>(null);
+  let currentLanguage = $state<string | null>(
+    browser ? localStorage.getItem(DRAFT_LANG_KEY) : null
+  );
   let langIsAdding = $state(false);
   let langCodeToAdd = $state("en");
   let copied = $state(false);
@@ -36,6 +57,24 @@
       }, 1000);
       return () => clearTimeout(timeout);
     }
+  });
+
+  $effect(() => {
+    const snapshot = JSON.stringify(formState);
+    const lang = currentLanguage;
+    const timeout = setTimeout(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, snapshot);
+        if (lang) {
+          localStorage.setItem(DRAFT_LANG_KEY, lang);
+        } else {
+          localStorage.removeItem(DRAFT_LANG_KEY);
+        }
+      } catch {
+        // storage unavailable or full — saving is best-effort
+      }
+    }, 300);
+    return () => clearTimeout(timeout);
   });
 
   const handleAddLanguage = () => {
