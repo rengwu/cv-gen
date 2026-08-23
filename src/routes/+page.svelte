@@ -7,6 +7,7 @@
   import ResumePreview from "../components/ResumePreview.svelte";
   import Welcome from "../components/Welcome.svelte";
   import type { InputData, ResumeData } from "../types";
+  import { inputDataSchema } from "@/resumeSchema";
   import { env } from "$env/dynamic/public";
 
   let { PUBLIC_PRELOADED_RESUME_DATA_URL: preloadedURL } = env ?? {};
@@ -38,9 +39,26 @@
 
   const loadResume = async (url: string) => {
     setMessage("Fetching resume data from URL...");
-    const data = (await (await fetch(url)).json()) ?? null;
-    setMessage("Checking fetched data...");
-    inputData = data;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`Request failed (HTTP ${response.status})`);
+      }
+      const json = await response.json();
+      setMessage("Checking fetched data...");
+      const result = inputDataSchema.safeParse(json);
+      if (!result.success) {
+        setMessage(
+          "The data at that URL is not a valid cv-gen resume export."
+        );
+        isLoadingResume = false;
+        return;
+      }
+      inputData = result.data as InputData;
+    } catch {
+      setMessage("Couldn't load resume data from that URL.");
+      isLoadingResume = false;
+    }
   };
 
   $: if (inputData) {

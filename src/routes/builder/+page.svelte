@@ -7,6 +7,7 @@
   import TextInput from "../../components/Builder/TextInput.svelte";
   import ResumePreview from "../../components/ResumePreview.svelte";
   import { copyToClipboard, downloadAsJSON } from "../../themes/utils";
+  import { inputDataSchema } from "@/resumeSchema";
   import type { InputData } from "../../types";
 
   let formState: InputData = {
@@ -16,6 +17,7 @@
     background: { type: "solid", color: "red" },
   };
   let jsonToImport: string = "";
+  let importError: string = "";
   let sidebarWidth: number = 360;
   let showSidebar: boolean = true;
 
@@ -55,18 +57,27 @@
   };
 
   const handleLoadJSON = async () => {
+    let parsed: unknown;
     try {
-      const imported = JSON.parse(jsonToImport);
-      formState = imported;
-      sidebarState = "builder";
-      const hasValidLanguage =
-        "languages" in formState && Object.keys(formState.languages).length > 0;
-      currentLanguage = hasValidLanguage
-        ? Object.keys(formState.languages)[0]
-        : "";
-    } catch (e) {
-      // handle error
+      parsed = JSON.parse(jsonToImport);
+    } catch {
+      importError = "That doesn't look like valid JSON.";
+      return;
     }
+    const result = inputDataSchema.safeParse(parsed);
+    if (!result.success) {
+      importError =
+        "This data doesn't match the cv-gen format — are you sure it's a resume export?";
+      return;
+    }
+    formState = result.data as InputData;
+    importError = "";
+    sidebarState = "builder";
+    const hasValidLanguage =
+      "languages" in formState && Object.keys(formState.languages).length > 0;
+    currentLanguage = hasValidLanguage
+      ? Object.keys(formState.languages)[0]
+      : "";
   };
 </script>
 
@@ -239,6 +250,9 @@
           current resume.
         </p>
         <Button class="mb-2 w-full" on:click={handleLoadJSON}>Load JSON</Button>
+        {#if importError}
+          <p class="text-xs text-red-600">{importError}</p>
+        {/if}
       </div>
     {:else if sidebarState === "saveResume"}
       <div class="pt-2 text-xs">

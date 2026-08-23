@@ -1,7 +1,8 @@
 @font-face {
-  font-family: "Serrif";
-  src: url("../assets/fonts/Serrif/Serrif/Serrif-TRIAL-Regular.otf") format("opentype");
-  font-weight: 300;
+  font-family: "Frank Ruhl Libre";
+  src: url("../assets/fonts/frank-ruhl-libre-v18-latin-regular.woff2") format("woff2"),
+    url("../assets/fonts/frank-ruhl-libre-v18-latin-regular.woff") format("woff");
+  font-weight: 400;
   font-style: normal;
 }
 

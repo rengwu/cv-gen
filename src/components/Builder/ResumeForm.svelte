@@ -111,11 +111,6 @@
   <FormSection title="Profile" class="flex flex-col gap-1">
     <TextInput placeholder="Name" bind:value={formState.profile.name} />
     <TextInput placeholder="Caption" bind:value={formState.profile.caption} />
-    <!-- <TextInput placeholder="Location" bind:value={formState.profile.location} />
-    <TextInput
-      placeholder="Description"
-      bind:value={formState.profile.description}
-    /> -->
   </FormSection>
   <FormSection title="Links" class="">
     {#each formState.profile.links as link, i}
