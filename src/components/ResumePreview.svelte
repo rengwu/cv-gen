@@ -1,37 +1,28 @@
 <script lang="ts">
-  import Handlebars from "handlebars";
-  import type { InputData, ResumeData, Theme } from "../types";
-  import { IDSchema } from "../themes/schema";
+  import type { InputData, ResumeData } from "../types";
   import { themes } from "../themes";
-  import {
-    appendDOMInnerHTML,
-    sectionMap,
-    setDOMInnerHTML,
-  } from "../themes/utils";
   import Button from "./Builder/Button.svelte";
 
   let {
     theme = "default",
-    renderOnlyOnce = true,
     hideLanguages = false,
     hidePrint = false,
     inputData,
     currentLanguage = $bindable(""),
   }: {
     theme?: keyof typeof themes;
-    renderOnlyOnce?: boolean;
     hideLanguages?: boolean;
     hidePrint?: boolean;
     inputData: InputData;
     currentLanguage?: string;
   } = $props();
 
-  let initialLoadComplete = $state(false);
-  let pageElement = $state<HTMLDivElement>();
-  let currentTheme: Theme = $derived(themes[theme]);
+  let currentTheme = $derived(themes[theme]);
 
   let resumeData: ResumeData | null = $derived(
-    inputData && currentLanguage ? (inputData.languages[currentLanguage] ?? null) : null
+    inputData && currentLanguage
+      ? (inputData.languages[currentLanguage] ?? null)
+      : null
   );
 
   $effect(() => {
@@ -42,44 +33,6 @@
     if (inputData && inputData.defaultLanguage && !currentLanguage) {
       currentLanguage = inputData.defaultLanguage;
     }
-  });
-
-  $effect(() => {
-    const el = pageElement;
-    const themeDef = currentTheme;
-    if (!el || !resumeData || !themeDef) return;
-    if (renderOnlyOnce && initialLoadComplete) return;
-
-    // load page template
-    el.innerHTML = Handlebars.compile(themeDef.pageTemplate)({});
-
-    // load profile and contact links
-    setDOMInnerHTML(IDSchema.profile.name, resumeData.profile.name);
-    setDOMInnerHTML(IDSchema.profile.caption, resumeData.profile.caption);
-    resumeData.profile.links.forEach((link) => {
-      appendDOMInnerHTML(
-        IDSchema.profile.links,
-        Handlebars.compile(themeDef.contactItemTemplate)(link)
-      );
-    });
-
-    // load sections
-    resumeData.sections.forEach((section) => {
-      appendDOMInnerHTML(
-        IDSchema.section.container,
-        Handlebars.compile(themeDef[sectionMap[section.type]])(section)
-      );
-    });
-
-    if (renderOnlyOnce && !initialLoadComplete) {
-      setTimeout(() => {
-        el.style.opacity = "1";
-      }, 250);
-    } else {
-      el.style.opacity = "1";
-    }
-
-    initialLoadComplete = true;
   });
 </script>
 
@@ -101,11 +54,11 @@
     </div>
   {/if}
 
-  <div
-    class="page-frame opacity-0 duration-200"
-    id="page"
-    bind:this={pageElement}
-  ></div>
+  {#if resumeData}
+    <div class="page-frame duration-200" id="page">
+      <currentTheme.Page {resumeData} icons={currentTheme.icons} />
+    </div>
+  {/if}
 
   <div id="credits-container" class="mb-4">
     <div class="text-[12px] text-white/70 opacity-70">
@@ -157,11 +110,6 @@
       box-shadow: unset !important;
       transform: none !important;
     }
-  }
-
-  #page {
-    transition-duration: 200ms;
-    transition-delay: 200ms;
   }
 
   .page-frame {

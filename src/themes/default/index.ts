@@ -1,19 +1,11 @@
 import type { Theme } from "../../types";
-import { contactItemTemplate } from "./components/contactItemTemplate";
-import { experienceSectionTemplate } from "./components/experienceSectionTemplate";
-import { skillsSectionTemplate } from "./components/skillsSectionTemplate";
-import { pageTemplate } from "./pageTemplate";
 import icons from "./assets/icons";
-import { summarySectionTemplate } from "./components/summarySectionTemplate";
+import Page from "./components/Page.svelte";
 
 export const theme: Theme = {
   name: "default",
-  pageTemplate: pageTemplate,
-  contactItemTemplate: contactItemTemplate,
-  experienceSectionTemplate: experienceSectionTemplate,
-  skillsSectionTemplate: skillsSectionTemplate,
-  summarySectionTemplate: summarySectionTemplate,
   icons: icons,
+  Page: Page,
 };
 
 export default theme;

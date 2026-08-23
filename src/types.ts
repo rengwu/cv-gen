@@ -1,16 +1,13 @@
+import type { Component } from "svelte";
 import type { themes } from "./themes";
-import type { sectionMap } from "./themes/utils";
 
 export type Theme = {
   name: string;
-  pageTemplate: string;
-  contactItemTemplate: string;
-  experienceSectionTemplate: string;
-  skillsSectionTemplate: string;
-  summarySectionTemplate: string;
-  icons: {
-    [key: string]: string;
-  };
+  icons: { [key: string]: string };
+  Page: Component<{
+    resumeData: ResumeData;
+    icons: { [key: string]: string };
+  }>;
 };
 
 export type InputData = {
@@ -49,7 +46,10 @@ export type Section<
 };
 
 export type ValidSection = ExperienceSection | SkillSection | SummarySection;
-export type ValidSectionDataTypeNames = keyof typeof sectionMap;
+export type ValidSectionDataTypeNames =
+  | "experienceList"
+  | "skillList"
+  | "summary";
 
 export type ExperienceSection = Section<Experience[], "experienceList">;
 export type SkillSection = Section<Skill[], "skillList"> & {

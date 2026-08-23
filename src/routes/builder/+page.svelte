@@ -6,7 +6,7 @@
   import FormSection from "../../components/Builder/FormSection.svelte";
   import TextInput from "../../components/Builder/TextInput.svelte";
   import ResumePreview from "../../components/ResumePreview.svelte";
-  import { copyToClipboard, downloadAsJSON } from "../../themes/utils";
+  import { copyToClipboard, downloadAsJSON } from "@/files";
   import { inputDataSchema } from "@/resumeSchema";
   import type { InputData } from "../../types";
 
@@ -299,7 +299,6 @@
         inputData={formState}
         theme="default"
         hideLanguages
-        renderOnlyOnce={false}
         {currentLanguage}
       />
     {/if}
