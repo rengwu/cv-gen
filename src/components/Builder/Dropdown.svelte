@@ -1,19 +1,35 @@
 <script lang="ts">
   import Button, { type ButtonSize, type ButtonType } from "./Button.svelte";
+  import type { Snippet } from "svelte";
 
-  let showDropdown: boolean = false;
-  type DirectionX = "left" | "right";
-  type DirectionY = "top" | "bottom";
-  export let positionX: DirectionX = "right";
-  export let positionY: DirectionY = "bottom";
+  let {
+    positionX = "right",
+    positionY = "bottom",
+    buttonProps = {
+      type: "secondary",
+      size: "default",
+    } as { [key: string]: any } & Partial<{
+      type: ButtonType;
+      size: ButtonSize;
+    }>,
+    class: className = "",
+    label,
+    icon,
+    children,
+  }: {
+    positionX?: "left" | "right";
+    positionY?: "top" | "bottom";
+    buttonProps?: { [key: string]: any } & Partial<{
+      type: ButtonType;
+      size: ButtonSize;
+    }>;
+    class?: string;
+    label?: Snippet;
+    icon?: Snippet;
+    children?: Snippet;
+  } = $props();
 
-  export let buttonProps: { [key: string]: any } & Partial<{
-    type: ButtonType;
-    size: ButtonSize;
-  }> = {
-    type: "secondary",
-    size: "default",
-  };
+  let showDropdown = $state(false);
 
   const handleDropdownFocusLoss = ({
     relatedTarget,
@@ -33,21 +49,18 @@
   };
 </script>
 
-<div
-  class={`relative ${$$restProps.class}`}
-  on:focusout={handleDropdownFocusLoss}
->
-  <Button on:click={() => (showDropdown = true)} {...buttonProps}>
-    <slot name="icon" />
-    <slot name="label" />
+<div class={`relative ${className}`} onfocusout={handleDropdownFocusLoss}>
+  <Button onclick={() => (showDropdown = true)} {...buttonProps}>
+    {#if icon}{@render icon()}{/if}
+    {#if label}{@render label()}{/if}
   </Button>
   {#if showDropdown}
     <button
-      on:click={() => (showDropdown = false)}
+      onclick={() => (showDropdown = false)}
       class="dropdown-list absolute w-fit flex flex-col items-start py-1 rounded shadow-lg bg-gray-100 text-gray-900 text-[12px] whitespace-nowrap z-20"
       style={`${positionX}: 0; ${positionY === "top" && "bottom: 100%;"} ${positionY === "bottom" && "top: 100%;"}`}
     >
-      <slot />
+      {@render children?.()}
     </button>
   {/if}
 </div>

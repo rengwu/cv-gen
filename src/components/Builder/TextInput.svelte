@@ -1,13 +1,23 @@
 <script lang="ts">
-  export let value = "";
-  export let placeholder = "";
-  export let id = "";
+  let {
+    value = $bindable(""),
+    placeholder = "",
+    id = "",
+    class: className = "",
+    ...rest
+  }: {
+    value?: string;
+    placeholder?: string;
+    id?: string;
+    class?: string;
+    [key: string]: any;
+  } = $props();
 </script>
 
 <input
-  {...$$restProps}
+  {...rest}
   type="text"
-  class={`form-field-text w-full ${$$restProps.class}`}
+  class={`form-field-text w-full ${className}`}
   bind:value
   {placeholder}
   {id}

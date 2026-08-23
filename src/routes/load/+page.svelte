@@ -35,7 +35,7 @@
         placeholder="https://link.to/your/export.json"
       />
       <Button
-        on:click={handleLoad}
+        onclick={handleLoad}
         disabled={url.length <= 0}
         class="px-4 py-1 bg-green-500/50 rounded whitespace-nowrap"
       >

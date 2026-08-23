@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Menu } from "lucide-svelte";
+  import Menu from "@lucide/svelte/icons/menu";
   import Button from "../../components/Builder/Button.svelte";
   import Form from "../../components/Builder/Form.svelte";
   import ResumeForm from "../../components/Builder/ResumeForm.svelte";
@@ -10,38 +10,40 @@
   import { inputDataSchema } from "@/resumeSchema";
   import type { InputData } from "../../types";
 
-  let formState: InputData = {
+  let formState = $state<InputData>({
     defaultLanguage: "",
     theme: "default",
     languages: {},
     background: { type: "solid", color: "red" },
-  };
-  let jsonToImport: string = "";
-  let importError: string = "";
-  let sidebarWidth: number = 360;
-  let showSidebar: boolean = true;
+  });
+  let jsonToImport = $state("");
+  let importError = $state("");
+  let sidebarWidth = $state(360);
+  let showSidebar = $state(true);
 
   const sidebarStates = ["builder", "importJSON", "saveResume"] as const;
-  let sidebarState: (typeof sidebarStates)[number] = sidebarStates[0];
+  let sidebarState = $state<(typeof sidebarStates)[number]>(sidebarStates[0]);
 
-  let currentLanguage: string | null = null;
-  let langIsAdding: boolean = false;
-  let langCodeToAdd: string = "en";
-  let copied: boolean = false;
+  let currentLanguage = $state<string | null>(null);
+  let langIsAdding = $state(false);
+  let langCodeToAdd = $state("en");
+  let copied = $state(false);
 
-  $: if (copied) {
-    setTimeout(() => {
-      copied = false;
-    }, 1000);
-  }
+  $effect(() => {
+    if (copied) {
+      const timeout = setTimeout(() => {
+        copied = false;
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  });
 
   const handleAddLanguage = () => {
     currentLanguage = langCodeToAdd;
     if (Object.keys(formState.languages).length <= 0) {
       formState.defaultLanguage = langCodeToAdd;
     }
-    const updatedLanguages = { ...formState.languages };
-    updatedLanguages[langCodeToAdd] = {
+    formState.languages[langCodeToAdd] = {
       profile: {
         name: "",
         caption: "",
@@ -51,7 +53,6 @@
       },
       sections: [],
     };
-    formState.languages = updatedLanguages;
     langCodeToAdd = "";
     langIsAdding = false;
   };
@@ -95,13 +96,13 @@
       <div class="flex flex-row items-center">
         <button
           class="flex items-center justify-center aspect-square h-[40px] ml-2"
-          on:click={() => (showSidebar = !showSidebar)}
+          onclick={() => (showSidebar = !showSidebar)}
           ><Menu color="#666" /></button
         >
         <div class="ml-2">
           <Button
             type="secondary"
-            on:click={() => {
+            onclick={() => {
               sidebarState = "importJSON";
               showSidebar = true;
             }}>Import from JSON</Button
@@ -117,7 +118,7 @@
         <Button
           disabled={Object.keys(formState.languages).length <= 0}
           type="default"
-          on:click={() => {
+          onclick={() => {
             sidebarState = "saveResume";
             showSidebar = true;
           }}
@@ -159,7 +160,7 @@
             <Button
               disabled={langCodeToAdd.length <= 0 ||
                 langCodeToAdd in formState.languages}
-              on:click={handleAddLanguage}
+              onclick={handleAddLanguage}
             >
               Next
             </Button>
@@ -170,7 +171,7 @@
           </div>
           <Button
             type="secondary"
-            on:click={() => {
+            onclick={() => {
               sidebarState = "importJSON";
               showSidebar = true;
             }}
@@ -189,7 +190,7 @@
             <div class="flex flex-row gap-1 flex-wrap">
               {#each Object.keys(formState.languages) as lang}
                 <Button
-                  on:click={() => (currentLanguage = lang)}
+                  onclick={() => (currentLanguage = lang)}
                   type={currentLanguage === lang ? "default" : "secondary"}
                 >
                   {lang}
@@ -205,14 +206,14 @@
                   <Button
                     disabled={langCodeToAdd.length <= 0 ||
                       langCodeToAdd in formState.languages}
-                    on:click={handleAddLanguage}
+                    onclick={handleAddLanguage}
                   >
                     Add
                   </Button>
                   <Button
                     type="secondary"
                     class="ml-2"
-                    on:click={() => {
+                    onclick={() => {
                       langIsAdding = false;
                       langCodeToAdd = "";
                     }}
@@ -221,7 +222,7 @@
                   </Button>
                 </div>
               {:else}
-                <Button on:click={() => (langIsAdding = true)} type="secondary">
+                <Button onclick={() => (langIsAdding = true)} type="secondary">
                   +
                 </Button>
               {/if}
@@ -229,7 +230,7 @@
           </FormSection>
         </Form>
         {#if currentLanguage !== null}
-          <ResumeForm bind:formState={formState.languages[currentLanguage]} />
+          <ResumeForm formState={formState.languages[currentLanguage]} />
         {/if}
       {/if}
     {:else if sidebarState === "importJSON"}
@@ -237,19 +238,19 @@
         <Button
           type="secondary"
           class="mb-2"
-          on:click={() => (sidebarState = "builder")}>Back</Button
+          onclick={() => (sidebarState = "builder")}>Back</Button
         >
         <p class="text-xs mb-2">Paste your resume data in JSON format here</p>
         <textarea
           placeholder={`{"defaultLanguage":"en","theme":"default","languages":{"en": { ... }}}`}
           class="w-full h-[300px] resize-none font-mono text-[11px] p-2"
           bind:value={jsonToImport}
-        />
+        ></textarea>
         <p class="text-xs mb-2">
           This will overwrite all existing data, make sure you have saved your
           current resume.
         </p>
-        <Button class="mb-2 w-full" on:click={handleLoadJSON}>Load JSON</Button>
+        <Button class="mb-2 w-full" onclick={handleLoadJSON}>Load JSON</Button>
         {#if importError}
           <p class="text-xs text-red-600">{importError}</p>
         {/if}
@@ -259,32 +260,31 @@
         <Button
           type="secondary"
           class="mb-2"
-          on:click={() => (sidebarState = "builder")}>Back</Button
+          onclick={() => (sidebarState = "builder")}>Back</Button
         >
         <p class="mb-2">The code below represents the data to your Resume.</p>
         <p class="mb-2">Please download it and store it somewhere safe.</p>
         <textarea
           class="w-full h-[200px] resize-none font-mono text-[11px] p-2"
-          value={JSON.stringify(formState)}
+          value={JSON.stringify(formState, null, 2)}
           readonly
-        />
+        ></textarea>
         <div class="flex flex-row gap-1 mb-1">
           <Button
             type="secondary"
-            on:click={async () => {
-              await copyToClipboard(JSON.stringify(formState)).then((res) => {
-                copied = true;
-              });
+            onclick={async () => {
+              await copyToClipboard(JSON.stringify(formState));
+              copied = true;
             }}
           >
             {copied ? "Copied to Clipboard!" : "Copy to Clipboard"}
           </Button>
-          <Button type="secondary" on:click={() => downloadAsJSON(formState)}
+          <Button type="secondary" onclick={() => downloadAsJSON(formState)}
             >Download as JSON</Button
           >
         </div>
         <div>
-          <Button type="secondary" on:click={() => print()}>Save as PDF</Button>
+          <Button type="secondary" onclick={() => print()}>Save as PDF</Button>
         </div>
       </div>
     {/if}

@@ -1,6 +1,9 @@
 <script lang="ts">
   import Dropdown from "./Dropdown.svelte";
-  import EllipsisVertical from "./EllipsisVertical.svelte";
+  import EllipsisVertical from "@lucide/svelte/icons/ellipsis-vertical";
+  import type { Snippet } from "svelte";
+
+  let { children }: { children?: Snippet } = $props();
 </script>
 
 <Dropdown
@@ -12,6 +15,8 @@
   positionX="right"
   positionY="bottom"
 >
-  <EllipsisVertical slot="icon" width="14" color="#555" />
-  <slot />
+  {#snippet icon()}
+    <EllipsisVertical size={14} color="#555" />
+  {/snippet}
+  {@render children?.()}
 </Dropdown>

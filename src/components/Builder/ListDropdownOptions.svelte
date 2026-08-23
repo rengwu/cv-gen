@@ -1,36 +1,37 @@
 <script lang="ts">
   import EllipsisDropdown from "./EllipsisDropdown.svelte";
 
-  export let list: any[];
-  export let item: any;
-  let i: number;
-  export { i as index };
+  let {
+    list,
+    item,
+    index,
+  }: { list: any[]; item: any; index: number } = $props();
 </script>
 
 <EllipsisDropdown>
   <button
-    disabled={i <= 0}
-    on:click={() => {
-      const tmp = list[i - 1];
-      list[i - 1] = list[i];
-      list[i] = tmp;
+    disabled={index <= 0}
+    onclick={() => {
+      const tmp = list[index - 1];
+      list[index - 1] = list[index];
+      list[index] = tmp;
     }}
   >
     Move Up
   </button>
   <button
-    disabled={i >= list.length - 1}
-    on:click={() => {
-      const tmp = list[i + 1];
-      list[i + 1] = list[i];
-      list[i] = tmp;
+    disabled={index >= list.length - 1}
+    onclick={() => {
+      const tmp = list[index + 1];
+      list[index + 1] = list[index];
+      list[index] = tmp;
     }}
   >
     Move Down
   </button>
   <button
-    on:click={() => {
-      list = [...list].filter((o) => o !== item);
+    onclick={() => {
+      list.splice(index, 1);
     }}
   >
     Delete

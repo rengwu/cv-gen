@@ -1,12 +1,26 @@
 <script lang="ts">
-  export let value = "";
-  export let placeholder = "";
-  export let id = "";
+  import type { Snippet } from "svelte";
+
+  let {
+    value = $bindable(""),
+    placeholder = "",
+    id = "",
+    class: className = "",
+    children,
+    ...rest
+  }: {
+    value?: string;
+    placeholder?: string;
+    id?: string;
+    class?: string;
+    children?: Snippet;
+    [key: string]: any;
+  } = $props();
 </script>
 
 <select
-  {...$$restProps}
-  class={`form-field-select w-full ${value.length === 0 ? "unselected" : ""} ${$$restProps.class}`}
+  {...rest}
+  class={`form-field-select w-full ${value.length === 0 ? "unselected" : ""} ${className}`}
   bind:value
   {placeholder}
   {id}
@@ -14,7 +28,7 @@
   {#if placeholder.length > 0}
     <option value="" disabled selected hidden>{placeholder}</option>
   {/if}
-  <slot />
+  {@render children?.()}
 </select>
 
 <style>

@@ -1,6 +1,6 @@
 <script lang="ts">
   import Handlebars from "handlebars";
-  import type { InputData, ResumeData } from "../types";
+  import type { InputData, ResumeData, Theme } from "../types";
   import { IDSchema } from "../themes/schema";
   import { themes } from "../themes";
   import {
@@ -10,40 +10,48 @@
   } from "../themes/utils";
   import Button from "./Builder/Button.svelte";
 
-  let themeName: keyof typeof themes = "default";
-  export { themeName as theme };
-  let theme = themes[themeName];
+  let {
+    theme = "default",
+    renderOnlyOnce = true,
+    hideLanguages = false,
+    hidePrint = false,
+    inputData,
+    currentLanguage = $bindable(""),
+  }: {
+    theme?: keyof typeof themes;
+    renderOnlyOnce?: boolean;
+    hideLanguages?: boolean;
+    hidePrint?: boolean;
+    inputData: InputData;
+    currentLanguage?: string;
+  } = $props();
 
-  let pageElement: HTMLDivElement;
-  let initialLoadComplete: boolean = false;
-  export let renderOnlyOnce: boolean = true;
+  let initialLoadComplete = $state(false);
+  let pageElement = $state<HTMLDivElement>();
+  let currentTheme: Theme = $derived(themes[theme]);
 
-  export let hideLanguages: boolean = false;
-  export let hidePrint: boolean = false;
+  let resumeData: ResumeData | null = $derived(
+    inputData && currentLanguage ? (inputData.languages[currentLanguage] ?? null) : null
+  );
 
-  export let inputData: InputData;
+  $effect(() => {
+    void import(`../themes/${theme}/styles/index.css`);
+  });
 
-  export let currentLanguage = "";
+  $effect(() => {
+    if (inputData && inputData.defaultLanguage && !currentLanguage) {
+      currentLanguage = inputData.defaultLanguage;
+    }
+  });
 
-  $: if (inputData && inputData.defaultLanguage && !currentLanguage) {
-    currentLanguage = inputData.defaultLanguage;
-  }
+  $effect(() => {
+    const el = pageElement;
+    const themeDef = currentTheme;
+    if (!el || !resumeData || !themeDef) return;
+    if (renderOnlyOnce && initialLoadComplete) return;
 
-  $: resumeData =
-    inputData && currentLanguage ? inputData.languages[currentLanguage] : null;
-
-  $: if (themeName) {
-    import(`../themes/${themeName}/styles/index.css`);
-  }
-
-  $: if (
-    pageElement &&
-    theme &&
-    resumeData &&
-    !(renderOnlyOnce && initialLoadComplete)
-  ) {
     // load page template
-    pageElement.innerHTML = Handlebars.compile(theme.pageTemplate)({});
+    el.innerHTML = Handlebars.compile(themeDef.pageTemplate)({});
 
     // load profile and contact links
     setDOMInnerHTML(IDSchema.profile.name, resumeData.profile.name);
@@ -51,7 +59,7 @@
     resumeData.profile.links.forEach((link) => {
       appendDOMInnerHTML(
         IDSchema.profile.links,
-        Handlebars.compile(theme.contactItemTemplate)(link)
+        Handlebars.compile(themeDef.contactItemTemplate)(link)
       );
     });
 
@@ -59,20 +67,20 @@
     resumeData.sections.forEach((section) => {
       appendDOMInnerHTML(
         IDSchema.section.container,
-        Handlebars.compile(theme[sectionMap[section.type]])(section)
+        Handlebars.compile(themeDef[sectionMap[section.type]])(section)
       );
     });
 
     if (renderOnlyOnce && !initialLoadComplete) {
       setTimeout(() => {
-        pageElement.style.opacity = "1";
+        el.style.opacity = "1";
       }, 250);
     } else {
-      pageElement.style.opacity = "1";
+      el.style.opacity = "1";
     }
 
     initialLoadComplete = true;
-  }
+  });
 </script>
 
 <div class="flex flex-col items-center px-8" id="page-container">
@@ -83,7 +91,7 @@
           <Button
             type={currentLanguage === language ? "default" : "naked"}
             class={`px-1.5 py-0.5 text-[13px] ${currentLanguage === language ? "" : "bg-gray-200/80 opacity-50 hover:opacity-100"}`}
-            on:click={() => (currentLanguage = language)}
+            onclick={() => (currentLanguage = language)}
             size="naked"
           >
             {language}
@@ -97,7 +105,7 @@
     class="page-frame opacity-0 duration-200"
     id="page"
     bind:this={pageElement}
-  />
+  ></div>
 
   <div id="credits-container" class="mb-4">
     <div class="text-[12px] text-white/70 opacity-70">
@@ -112,7 +120,7 @@
     <Button
       type="default"
       class="fixed bottom-[24px] right-[24px] !text-[16px] !px-5 !py-2 !rounded-full font-medium"
-      on:click={() => print()}
+      onclick={() => print()}
     >
       Print
     </Button>

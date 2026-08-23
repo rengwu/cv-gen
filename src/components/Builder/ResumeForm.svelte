@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Plus } from "lucide-svelte";
+  import Plus from "@lucide/svelte/icons/plus";
 
   import { themes } from "../../themes";
   import type {
@@ -18,96 +18,67 @@
   import SelectInput from "./SelectInput.svelte";
   import TextInput from "./TextInput.svelte";
 
-  export let formState: ResumeData;
+  let { formState, class: className = "" }: { formState: ResumeData; class?: string } =
+    $props();
 
   let currentTheme: Theme =
     themes[Object.keys(themes)[0] as keyof typeof themes];
 
-  let experienceSectionTemplate: ValidSection = {
-    title: "",
-    data: [],
-    type: "experienceList",
+  const sectionTemplates: { [key: string]: ValidSection } = {
+    experience: {
+      title: "",
+      data: [],
+      type: "experienceList",
+    },
+    skills: {
+      title: "",
+      data: [],
+      type: "skillList",
+      labels: { low: "rarely", high: "often" },
+    },
+    summary: {
+      title: "",
+      data: { description: "" },
+      type: "summary",
+    },
   };
 
-  let skillSectionTemplate: ValidSection = {
-    title: "",
-    data: [],
-    type: "skillList",
-    labels: { low: "rarely", high: "often" },
-  };
-
-  let summarySectionTemplate: ValidSection = {
-    title: "",
-    data: { description: "" },
-    type: "summary",
-  };
-
-  let sectionTemplateMap = {
-    experience: experienceSectionTemplate,
-    skills: skillSectionTemplate,
-    summary: summarySectionTemplate,
-  };
-
-  let experienceDataTemplate: Experience = {
-    title: "",
-    subtitle: "",
-    location: "",
-    date: "",
-    items: [],
-  };
-
-  let skillDataTemplate: Skill = {
-    name: "",
-    level: 1,
-  };
-  let contactLinkTemplate: Link = {
-    label: "",
-    href: "",
-    icon: "",
-  };
-
-  const addSection = (type: keyof typeof sectionTemplateMap) => {
-    const template = { ...sectionTemplateMap[type] };
-    formState = { ...formState, sections: [...formState.sections, template] };
+  const addSection = (type: keyof typeof sectionTemplates) => {
+    formState.sections.push(structuredClone(sectionTemplates[type]));
   };
 
   const addContactLink = () => {
-    const template = { ...contactLinkTemplate };
-    formState.profile.links = [...formState.profile.links, template];
+    formState.profile.links.push({ label: "", href: "", icon: "" });
   };
 
   const addExperienceItem = (index: number) => {
-    const template = { ...experienceDataTemplate };
-    formState.sections[index].data = [
-      ...(formState.sections[index].data as Experience[]),
-      template,
-    ];
+    (formState.sections[index].data as Experience[]).push({
+      title: "",
+      subtitle: "",
+      location: "",
+      date: "",
+      items: [],
+    });
   };
 
   const addSkillItem = (index: number) => {
-    const template = { ...skillDataTemplate };
-    formState.sections[index].data = [
-      ...(formState.sections[index].data as Skill[]),
-      template,
-    ];
+    (formState.sections[index].data as Skill[]).push({
+      name: "",
+      level: 1,
+    });
   };
 
   const addExperienceBulletItem = (
     sectionIndex: number,
     experienceIndex: number
   ) => {
-    const existingItems = [
-      ...(formState.sections[sectionIndex].data as Experience[])[
-        experienceIndex
-      ].items,
-    ];
     (formState.sections[sectionIndex].data as Experience[])[
       experienceIndex
-    ].items = [...existingItems, ""];
+    ].items.push("");
   };
 </script>
 
-<Form class={$$restProps.class}>
+<Form class={className}>
   <FormSection title="Profile" class="flex flex-col gap-1">
     <TextInput placeholder="Name" bind:value={formState.profile.name} />
     <TextInput placeholder="Caption" bind:value={formState.profile.caption} />
@@ -129,7 +100,7 @@
               bind:value={formState.profile.links[i].icon}
               placeholder="Icon"
             >
-              {#each Object.entries(currentTheme.icons) as [name, icon], i}
+              {#each Object.entries(currentTheme.icons) as [name, icon]}
                 <option value={icon}>{name}</option>
               {/each}
             </SelectInput>
@@ -143,15 +114,17 @@
           />
         </div>
         <ListDropdownOptions
-          bind:list={formState.profile.links}
+          list={formState.profile.links}
           item={link}
           index={i}
         />
       </div>
     {/each}
     <div class="flex justify-end">
-      <Button type="secondary" on:click={addContactLink}>
-        <Plus size={18} class="mr-1" slot="icon" />
+      <Button type="secondary" onclick={addContactLink}>
+        {#snippet icon()}
+          <Plus size={18} class="mr-1" />
+        {/snippet}
         Add Link
       </Button>
     </div>
@@ -171,14 +144,14 @@
               bind:value={section.title}
             />
             <ListDropdownOptions
-              bind:list={formState.sections}
+              list={formState.sections}
               item={section}
               index={i}
             />
           </div>
 
           {#if section.type === "experienceList"}
-            <div class="border-b my-1 border-black/10" />
+            <div class="border-b my-1 border-black/10"></div>
             {#each section.data as experience, j}
               <div class="flex flex-col gap-1 p-3 bg-black/5 rounded-lg">
                 <div class="flex flex-row flex-nowrap">
@@ -189,7 +162,7 @@
                     bind:value={experience.title}
                   />
                   <ListDropdownOptions
-                    bind:list={section.data}
+                    list={section.data}
                     item={experience}
                     index={j}
                   />
@@ -223,14 +196,14 @@
                 {/if}
                 {#each experience.items as bullet, k}
                   <div class="flex mb-2 flex-row flex-nowrap">
-                    <div class="mt-2 mx-1.5 h-1 w-1 bg-black/20 rounded-full" />
+                    <div class="mt-2 mx-1.5 h-1 w-1 bg-black/20 rounded-full"></div>
                     <textarea
                       class="w-full text-xs rounded-[2px] mb-[-6px] p-1"
                       placeholder="Bullet text"
-                      bind:value={bullet}
-                    />
+                      bind:value={experience.items[k]}
+                    ></textarea>
                     <ListDropdownOptions
-                      bind:list={experience.items}
+                      list={experience.items}
                       item={bullet}
                       index={k}
                     />
@@ -239,14 +212,14 @@
                 <div class="flex justify-end">
                   <Button
                     type="secondary"
-                    on:click={() => addExperienceBulletItem(i, j)}
+                    onclick={() => addExperienceBulletItem(i, j)}
                   >
                     Add Bullet
                   </Button>
                 </div>
               </div>
             {/each}
-            <Button type="secondary" on:click={() => addExperienceItem(i)}>
+            <Button type="secondary" onclick={() => addExperienceItem(i)}>
               Add Experience
             </Button>
           {:else if section.type === "skillList"}
@@ -262,7 +235,7 @@
                 bind:value={section.labels.high}
               />
             </div>
-            <div class="border-b my-1 border-black/10" />
+            <div class="border-b my-1 border-black/10"></div>
             {#each section.data as skill, k}
               <div class="relative flex flex-row flex-nowrap">
                 <TextInput
@@ -283,13 +256,13 @@
                   max={5}
                 />
                 <ListDropdownOptions
-                  bind:list={section.data}
+                  list={section.data}
                   item={skill}
                   index={k}
                 />
               </div>
             {/each}
-            <Button type="secondary" on:click={() => addSkillItem(i)}>
+            <Button type="secondary" onclick={() => addSkillItem(i)}>
               Add Skill
             </Button>
           {:else if section.type === "summary"}
@@ -298,7 +271,7 @@
                 class="w-full text-xs rounded-[2px] mb-[-6px] p-1"
                 placeholder="Summary description"
                 bind:value={section.data.description}
-              />
+              ></textarea>
             </div>
           {/if}
         </div>
@@ -306,13 +279,17 @@
     {/each}
     <div class="flex justify-end pb-[250px]">
       <Dropdown>
-        <Plus size={18} class="mr-1" slot="icon" />
-        <span slot="label">Add Section</span>
-        <button on:click={() => addSection("experience")}>
+        {#snippet icon()}
+          <Plus size={18} class="mr-1" />
+        {/snippet}
+        {#snippet label()}
+          <span>Add Section</span>
+        {/snippet}
+        <button onclick={() => addSection("experience")}>
           Experience Section
         </button>
-        <button on:click={() => addSection("skills")}>Skills Section</button>
-        <button on:click={() => addSection("summary")}>Summary Section</button>
+        <button onclick={() => addSection("skills")}>Skills Section</button>
+        <button onclick={() => addSection("summary")}>Summary Section</button>
       </Dropdown>
     </div>
   </FormSection>

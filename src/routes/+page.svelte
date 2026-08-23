@@ -11,11 +11,11 @@
   import { env } from "$env/dynamic/public";
 
   let { PUBLIC_PRELOADED_RESUME_DATA_URL: preloadedURL } = env ?? {};
-  let inputData: InputData;
-  let resumeData: ResumeData;
-  let isLoadingResume: boolean = true;
-  let message: string = "Loading...";
-  $: messageIsShowing = !resumeData && isLoadingResume;
+  let inputData = $state<InputData>();
+  let resumeData = $state<ResumeData>();
+  let isLoadingResume = $state(true);
+  let message = $state("Loading...");
+  let messageIsShowing = $derived(!resumeData && isLoadingResume);
 
   const setMessage = (msg: string) => {
     message = msg;
@@ -61,25 +61,26 @@
     }
   };
 
-  $: if (inputData) {
+  $effect(() => {
+    if (!inputData) return;
     setMessage("Preparing to display resume...");
-    const { defaultLanguage, languages } = inputData ?? {};
+    const { defaultLanguage, languages } = inputData;
     const langKeys = languages ? Object.keys(languages) : [];
-    const hasDefaultLanguage = defaultLanguage && defaultLanguage in languages;
+    const hasDefaultLanguage =
+      defaultLanguage && defaultLanguage in languages;
 
     if (langKeys.length > 0) {
-      resumeData =
-        languages[hasDefaultLanguage ? defaultLanguage : langKeys[0]];
+      resumeData = languages[hasDefaultLanguage ? defaultLanguage : langKeys[0]];
     } else {
       setMessage(
         "Can't find any languages in your resume, it seems to be empty!"
       );
     }
-  }
+  });
 </script>
 
 <div class="h-full overflow-auto">
-  {#if resumeData}
+  {#if resumeData && inputData}
     <ResumePreview {inputData} />
   {:else if !isLoadingResume}
     <FadeIn class="h-full">
@@ -90,9 +91,9 @@
   {/if}
   <Message
     style={`
-        opacity: ${messageIsShowing ? 1 : 0}; 
-        transition-delay: 200ms; 
-        transition-duration: 200ms; 
+        opacity: ${messageIsShowing ? 1 : 0};
+        transition-delay: 200ms;
+        transition-duration: 200ms;
         pointer-events: none
     `}
   >

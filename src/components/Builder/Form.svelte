@@ -1,5 +1,12 @@
-<div class={`form ${$$restProps.class}`}>
-  <slot />
+<script lang="ts">
+  import type { Snippet } from "svelte";
+
+  let { class: className = "", children }: { class?: string; children?: Snippet } =
+    $props();
+</script>
+
+<div class={`form ${className}`}>
+  {@render children?.()}
 </div>
 
 <style>

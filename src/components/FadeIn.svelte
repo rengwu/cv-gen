@@ -1,18 +1,26 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import type { Snippet } from "svelte";
+
+  let {
+    class: className = "",
+    duration = 500,
+    children,
+  }: { class?: string; duration?: number; children?: Snippet } = $props();
+
   let element: HTMLDivElement;
-  export let duration: number = 500;
-  onMount(() => {
-    setTimeout(() => {
+
+  $effect(() => {
+    const timeout = setTimeout(() => {
       element.style.setProperty("opacity", "1");
     }, 10);
+    return () => clearTimeout(timeout);
   });
 </script>
 
 <div
-  class={$$restProps.class}
+  class={className}
   style={`opacity: 0; transition-duration: ${duration}ms`}
   bind:this={element}
 >
-  <slot />
+  {@render children?.()}
 </div>

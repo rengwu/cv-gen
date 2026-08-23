@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script lang="ts" module>
   const buttonTypes = [
     "secondary",
     "default",
@@ -20,22 +20,38 @@
 </script>
 
 <script lang="ts">
-  export let type: ButtonType = "default";
-  export let disabled = false;
-  export let id = "";
+  import type { Snippet } from "svelte";
 
-  export let size: ButtonSize = "default";
+  let {
+    type = "default" as ButtonType,
+    disabled = false,
+    id = "",
+    size = "default" as ButtonSize,
+    class: className = "",
+    onclick,
+    children,
+    icon,
+  }: {
+    type?: ButtonType;
+    disabled?: boolean;
+    id?: string;
+    size?: ButtonSize;
+    class?: string;
+    onclick?: (event: MouseEvent) => void;
+    children?: Snippet;
+    icon?: Snippet;
+  } = $props();
 </script>
 
 <button
-  class={`button flex flex-nowrap items-center justify-center ${type} ${$$restProps.class}`}
-  style={`${buttonSizes[size].style}`}
+  class={`button flex flex-nowrap items-center justify-center ${type} ${className}`}
+  style={buttonSizes[size].style}
   {disabled}
   {id}
-  on:click
+  {onclick}
 >
-  <slot name="icon" />
-  <slot>Button</slot>
+  {#if icon}{@render icon()}{/if}
+  {#if children}{@render children()}{:else}Button{/if}
 </button>
 
 <style>
