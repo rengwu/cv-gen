@@ -1,0 +1,91 @@
+version = 1
+
+[[tickets]]
+id = "01"
+file = "tickets/01-vitest-harness-and-fixtures.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+]
+
+[[tickets]]
+id = "02"
+file = "tickets/02-allowlist-link-schemes.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+]
+
+[[tickets]]
+id = "03"
+file = "tickets/03-clamp-skill-levels.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+]
+
+[[tickets]]
+id = "04"
+file = "tickets/04-fix-load-url-round-trip.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+]
+
+[[tickets]]
+id = "05"
+file = "tickets/05-honour-input-data-theme.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+  ["pnpm", "build"],
+]
+
+[[tickets]]
+id = "06"
+file = "tickets/06-second-theme-and-picker.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+  ["pnpm", "build"],
+]
+
+[[tickets]]
+id = "07"
+file = "tickets/07-render-or-rule-out-background.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+  ["pnpm", "build"],
+]
+
+[[tickets]]
+id = "08"
+file = "tickets/08-builder-accessibility-pass.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+]
+
+[[tickets]]
+id = "09"
+file = "tickets/09-ci-and-deploy-config.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+  ["pnpm", "build"],
+]
+
+[[tickets]]
+id = "10"
+file = "tickets/10-dynamic-site-metadata.md"
+checks = [
+  ["pnpm", "check"],
+  ["pnpm", "test"],
+  ["pnpm", "build"],
+]
+
+[hooks]
+before_ticket = []
+after_ticket = []
+after_chain = []
